@@ -1,6 +1,7 @@
 '''Andrew Burton. 9.29.2020'''
 
-'''Plots daily/total death data due to covid and/or daily hospitalization                rates/morbidity for input jurisdiction .'''
+'''Plots daily/total death data due to covid and/or daily hospitalization               
+   rates/morbidity for input jurisdiction .'''
 ################################################################################
 
 import os
@@ -32,7 +33,7 @@ fileName = 'Reference_hospitalization_all_locs.csv'
 
 def readCSV_D(aFile,i,locID):
     '''Reads input csv file (aFile) and returns numpy array of data from input
-       jurisdiction locID. Input i determines if total and/or smooth data is
+       jurisdiction locID. Input i determines if cummulative deaths is 
        returned.'''
     logger.debug(f'Initiating readCSV_D(), reading: {aFile}, locID: {locID}')
     cData, dates = [], []
@@ -281,7 +282,7 @@ def main(fName):
     if args.hosp:
         dates, data = readCSV_H(fName,locDict[args.loc])
         plotData_H(dates, data, args.loc, args.proj, args.log)
-    if args.death:
+    if args.death or args.tot:
         dates,data = readCSV_D(fName, 25+(args.tot*3), locDict[args.loc])
         plotData_D(dates, data, args.loc, args.tot, args.proj, args.log)
 
