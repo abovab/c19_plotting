@@ -31,27 +31,7 @@ fileName = 'Reference_hospitalization_all_locs.csv'
 
 ################################################################################
 
-def readCSV_D(aFile,i,locID):
-    '''Reads input csv file (aFile) and returns numpy array of data from input
-       jurisdiction locID. Input i determines if cummulative deaths is 
-       returned.'''
-    logger.debug(f'Initiating readCSV_D(), reading: {aFile}, locID: {locID}')
-    cData, dates = [], []
-    with open(aFile,'r') as f:
-        r = csv.reader(f)
-        for l in r:
-            if l[3] == locID:
-                dates.append(datetime.strptime(l[2],"%Y-%m-%d"))
-                if l[38] == '':
-                    mob = 0
-                else:
-                    mob = float(l[38])
-                cData.append([l[i],l[i+1],l[i+2],mob])
-    return dates, np.array(cData, dtype=float)
-
-################################################################################
-
-def readCSV_H(aFile,locID):
+def readCSV(aFile,locID,i=False):
     '''Reads input csv file (aFile) and returns numpy array of data from input
        jurisdiction locID.'''
     logger.debug(f'Initiating readCSV_H(), reading: {aFile}, locID: {locID}')
@@ -61,13 +41,20 @@ def readCSV_H(aFile,locID):
         for l in r:
             if l[3] == locID:
                 dates.append(datetime.strptime(l[2],"%Y-%m-%d"))
-                if l[41] == '':
-                    confirmed = [np.NaN]
+                if type(i) == int:
+                    if l[38] == '':
+                        cData.append([l[i],l[i+1],l[i+2],0])
+                    else:
+                        cData.append([l[i],l[i+1],l[i+2],float(l[38])])
                 else:
-                    confirmed = [float(l[41])]
-                cData.append([i for i in l[42:45]] +
-                             [j for j in l[ 4:13]] +
-                             [k for k in l[46:49]] + confirmed)
+                    if l[41] == '':
+                        cData.append([h for h in l[42:45]] +
+                                     [j for j in l[ 4:13]] +
+                                     [k for k in l[46:49]] + [np.NaN])
+                    else:
+                        cData.append([h for h in l[42:45]] +
+                                     [j for j in l[ 4:13]] +
+                                     [k for k in l[46:49]] + [float(l[41])])
     return dates, np.array(cData, dtype=float)
 
 ################################################################################
@@ -280,10 +267,10 @@ def main(fName):
     args = parser.parse_args()
 
     if args.hosp:
-        dates, data = readCSV_H(fName,locDict[args.loc])
+        dates, data = readCSV(fName, locDict[args.loc])
         plotData_H(dates, data, args.loc, args.proj, args.log)
     if args.death or args.tot:
-        dates,data = readCSV_D(fName, 25+(args.tot*3), locDict[args.loc])
+        dates, data = readCSV(fName, locDict[args.loc], 25+(args.tot*3))
         plotData_D(dates, data, args.loc, args.tot, args.proj, args.log)
 
 ################################################################################
