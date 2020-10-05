@@ -33,7 +33,8 @@ fileName = 'Reference_hospitalization_all_locs.csv'
 
 def readCSV(aFile,locID,i=False):
     '''Reads input csv file (aFile) and returns numpy array of data from input
-       jurisdiction locID.'''
+       jurisdiction locID. If int i passed as argument, data returned will be 
+       death statistics, otherwise cases/hospitalization data will be returned'''
     logger.debug(f'Initiating readCSV_H(), reading: {aFile}, locID: {locID}')
     cData, dates = [], []
     with open(aFile,'r') as f:
